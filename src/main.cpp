@@ -2,43 +2,39 @@
 
 #include <stdbool.h>
 
-enum { Red, Green, Blue};
-DigitalOut LED[] = {
-  DigitalOut(PTB22,1),
-  DigitalOut(PTE26,1),
-  DigitalOut(PTC21,1)
+class LED {
+  DigitalOut pin;
+public:
+  LED(PinName p) : pin(p,1) {}
+  void  on(void) { pin.write(0);}
+  void off(void) { pin.write(1);}
 };
-
-void LEDon(int n) {
-  LED[n].write(0);
-}
-void LEDoff(int n) {
-  LED[n].write(1);
-}
+LED light[] = { LED(PTB22), LED(PTE26), LED(PTB21) };
+enum { Red, Green, Blue};
 
 enum { Btn1, Btn2 };
-DigitalIn buttons[] = {
-  DigitalIn(SW2), DigitalIn(SW3)
+class Button {
+  DigitalIn pin;
+public:
+  Button(PinName p) : pin(p) {};
+  bool ispressed(void) { return !pin.read(); };
 };
-
-bool ispressed(int b) {
-  return !(buttons[b].read());
-}
-
+Button buttons[] = {Button(SW2), Button(SW3)};
 int main() {
     bool flashing = false;
 
 
     while(1) {
-        if(ispressed(Btn1) ) flashing = !flashing;
+        if(buttons[Btn1].ispressed() ) flashing = true;
+        if(buttons[Btn2].ispressed() ) flashing = false;
 
         if(flashing){
-            LEDon(Red);
+            light[Red].on();
             wait(0.5);
-            LEDoff(Red);
+            light[Red].off();
             wait(0.5);
         }else{
-            LEDoff(Red);
+            light[Red].off();
             wait(1);
         }
     }
