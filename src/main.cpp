@@ -2,24 +2,43 @@
 
 #include <stdbool.h>
 
+enum { Red, Green, Blue};
+DigitalOut LED[] = {
+  DigitalOut(PTB22,1),
+  DigitalOut(PTE26,1),
+  DigitalOut(PTC21,1)
+};
+
+void LEDon(int n) {
+  LED[n].write(0);
+}
+void LEDoff(int n) {
+  LED[n].write(1);
+}
+
+enum { Btn1, Btn2 };
+DigitalIn buttons[] = {
+  DigitalIn(SW2), DigitalIn(SW3)
+};
+
+bool ispressed(int b) {
+  return !(buttons[b].read());
+}
+
 int main() {
     bool flashing = false;
 
-    DigitalOut red(PTB22);
-    DigitalIn  btn(PTC6);
 
     while(1) {
-        if( btn.read() ) flashing = true;
-            else         flashing = false;
+        if(ispressed(Btn1) ) flashing = !flashing;
 
-        printf("button %d\n", btn.read() );
         if(flashing){
-            red.write(0);
+            LEDon(Red);
             wait(0.5);
-            red.write(1);
+            LEDoff(Red);
             wait(0.5);
         }else{
-            red.write(1);
+            LEDoff(Red);
             wait(1);
         }
     }
